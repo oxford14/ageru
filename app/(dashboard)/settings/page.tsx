@@ -82,10 +82,17 @@ export default async function SettingsPage() {
         <Row label="While the app is open">Checked every 45 seconds</Row>
         <Row label="In the background">
           {cronReady ? (
-            "Every 5 minutes via the cron job (when deployed on Vercel)"
+            <span>
+              Optional: ping{" "}
+              <code className="font-mono text-xs">POST /api/cron/sync-orders</code> on a schedule
+              (e.g. cron-job.org) with header{" "}
+              <code className="font-mono text-xs">Authorization: Bearer CRON_SECRET</code>.
+            </span>
           ) : (
             <span className="text-muted-foreground">
-              Off. Set <code className="font-mono">CRON_SECRET</code> and deploy to Vercel to check every 5 minutes.
+              Off unless you set <code className="font-mono">CRON_SECRET</code> and call{" "}
+              <code className="font-mono">/api/cron/sync-orders</code> from an external scheduler.
+              While you use the app, sync still runs every 45 seconds.
             </span>
           )}
         </Row>

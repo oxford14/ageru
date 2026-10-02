@@ -9,7 +9,7 @@ Production-ready customer/reseller SMM ordering panel built with Next.js App Rou
 - Provider abstraction (`SmmV2Provider`, `ManualProvider`) — secrets stay server-side
 - PayMongo-ready payments with webhook-verified wallet credits
 - Atomic wallet RPCs (reserve, deposit, refund)
-- Vercel cron-compatible order/balance sync
+- Order status sync while the app is open; optional HTTP cron endpoints for background polling
 
 ## Local setup
 
@@ -23,7 +23,7 @@ Fill `.env.local`:
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY` (server only)
 - `ENCRYPTION_KEY` — 32-byte base64 or passphrase for provider API key encryption
-- `CRON_SECRET` — random string for cron auth
+- `CRON_SECRET` — optional; secures `/api/cron/*` if you use an external scheduler (not required on Vercel Hobby)
 - `PAYMENT_PROVIDER=manual` for local wallet testing (or `paymongo` with keys)
 - `NEXT_PUBLIC_APP_URL=http://localhost:3000`
 
@@ -78,10 +78,10 @@ Wallet credits only after verified webhook — not from client redirect alone.
 
 ## Vercel deployment
 
-1. Import repo, set all env vars from `.env.example`
-2. Deploy
-3. Configure cron secret on Vercel (Authorization: Bearer `CRON_SECRET`)
-4. Crons defined in `vercel.json`
+1. Import repo, set env vars from `.env.example` (Hobby tier works; no Vercel Cron config in this repo).
+2. Deploy.
+3. **Optional background sync:** set `CRON_SECRET`, then schedule `POST https://your-domain/api/cron/sync-orders` with header `Authorization: Bearer <CRON_SECRET>` (e.g. [cron-job.org](https://cron-job.org), GitHub Actions). Order status still updates every ~45s while you have the panel open without this.
+4. **Optional log cleanup:** schedule `POST /api/cron/cleanup` daily with the same auth.
 
 ## Production security checklist
 

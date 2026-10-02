@@ -11,10 +11,13 @@ import { ComposerProvider } from "@/components/composer/composer-provider";
 export async function AppShell({
   email,
   activeCount,
+  isAccountOwner = false,
   children,
 }: {
   email: string;
   activeCount: number;
+  /** Shows owner-only navigation such as Users. */
+  isAccountOwner?: boolean;
   children: React.ReactNode;
 }) {
   const cfg = getPanelConfig();
@@ -34,7 +37,7 @@ export async function AppShell({
           </div>
 
           <div className="mt-5 px-3">
-            <SidebarNav activeCount={activeCount} />
+            <SidebarNav activeCount={activeCount} showUsers={isAccountOwner} />
           </div>
 
           <div className="mt-auto space-y-4 p-3">

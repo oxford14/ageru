@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Layers, ListOrdered, Plus, Search, Settings } from "lucide-react";
+import { Home, Layers, ListOrdered, Plus, Search, Settings, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useComposer } from "@/components/composer/composer-provider";
 
@@ -12,6 +12,8 @@ const items = [
   { href: "/services", label: "Services", icon: Search },
   { href: "/combos", label: "Combos", icon: Layers },
   { href: "/settings", label: "Settings", icon: Settings },
+  // Owner only; hidden for other users.
+  { href: "/users", label: "Users", icon: Users },
 ] as const;
 
 function isActive(pathname: string, href: string) {
@@ -24,11 +26,19 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function SidebarNav({ activeCount }: { activeCount: number }) {
+export function SidebarNav({
+  activeCount,
+  showUsers = false,
+}: {
+  activeCount: number;
+  showUsers?: boolean;
+}) {
   const pathname = usePathname();
   return (
     <nav className="flex flex-col gap-0.5" aria-label="Main">
-      {items.map(({ href, label, icon: Icon }) => {
+      {items
+        .filter((item) => item.href !== "/users" || showUsers)
+        .map(({ href, label, icon: Icon }) => {
         const active = isActive(pathname, href);
         return (
           <Link
