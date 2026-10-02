@@ -469,16 +469,16 @@ export function OrderComposer({
   }
 
   return (
-    <div className="grid h-full min-h-0 md:grid-cols-[minmax(0,1fr)_300px]" onKeyDown={onComposerKeyDown}>
+    <div className="grid h-full min-h-0 grid-cols-1 grid-rows-1 md:grid-cols-[minmax(0,1fr)_300px]" onKeyDown={onComposerKeyDown}>
       <div className="flex min-h-0 flex-col">
-        <header className="flex items-center gap-3 border-b px-5 py-3.5 pr-12">
+        <header className="flex items-center gap-3 border-b px-4 py-3.5 pr-12 sm:px-5">
           <div className="min-w-0">
             <p className="text-[15px] font-semibold tracking-[-0.01em]">New order</p>
             <p className="text-xs text-muted-foreground">Paste a link. We&apos;ll work out the rest.</p>
           </div>
         </header>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-5 sm:py-6">
           <ol className="relative space-y-8 before:absolute before:top-3 before:bottom-3 before:left-[11px] before:w-px before:bg-border">
             {/* 1 — Where */}
             <Step n={1} title="Where should it go?" done={!!insight && !!platform}>
@@ -587,7 +587,7 @@ export function OrderComposer({
                     onNavigate={onClose}
                   />
                 ) : (
-                  <div className="mt-6 grid gap-2 md:grid-cols-2">
+                  <div className="mt-6 grid grid-cols-1 gap-2 md:grid-cols-2">
                     {[0, 1, 2, 3].map((i) => (
                       <div key={i} className="h-11 animate-pulse rounded-lg bg-muted" />
                     ))}
@@ -643,7 +643,7 @@ export function OrderComposer({
             {platform && goal && !showPlatformPicker ? (
                 <Step key={`which-${goal}`} n={3} title="Which service?" done={!!service} sectionRef={whichRef} appear>
                   {picks.length ? (
-                    <div className="grid gap-2 sm:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                       {picks.map(({ service: s, reason }) => {
                         const Icon = PICK_ICON[reason];
                         const active = s.id === serviceId;
@@ -950,7 +950,7 @@ export function OrderComposer({
         </div>
 
         {/* Mobile footer — the slip lives in the side column on desktop */}
-        <div className="flex items-center gap-3 border-t bg-card px-4 py-3 md:hidden">
+        <div className="flex items-center gap-3 border-t bg-card px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden">
           <div className="min-w-0 flex-1">
             <p className="text-xs text-muted-foreground">{blocker ?? "Ready to send"}</p>
             <p className="text-lg font-semibold tabular-nums">{formatCurrency(cost, currency)}</p>

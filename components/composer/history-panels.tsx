@@ -109,7 +109,7 @@ export function StartPanels({
   const favoritesBlock = favorites.length ? (
     <div className="mt-6">
       <PanelTitle icon={Star}>Favourites</PanelTitle>
-      <ul className="grid gap-1.5 sm:grid-cols-2">
+      <ul className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
         {favorites.slice(0, 6).map((f) => (
           <li key={f.id}>
             <button
@@ -148,7 +148,7 @@ export function StartPanels({
   return (
     <>
       {favoritesBlock}
-      <div className="mt-6 grid gap-6 md:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
         {recent.length ? (
           <div>
             <PanelTitle icon={History}>Recent links</PanelTitle>

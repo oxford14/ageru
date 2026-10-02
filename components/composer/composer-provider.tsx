@@ -97,7 +97,7 @@ export function ComposerProvider({ children }: { children: React.ReactNode }) {
         }}
       >
         <DialogContent
-          className="h-[min(760px,calc(100dvh-1.5rem))] max-w-[calc(100%-1rem)] gap-0 overflow-hidden p-0 sm:max-w-[960px]"
+          className="grid h-dvh max-h-dvh w-full max-w-full grid-cols-1 grid-rows-1 gap-0 overflow-hidden rounded-none p-0 ring-0 sm:h-[min(760px,calc(100dvh-1.5rem))] sm:max-w-[960px] sm:rounded-xl sm:ring-1"
           showCloseButton={!busy}
         >
           <DialogTitle className="sr-only">New order</DialogTitle>
