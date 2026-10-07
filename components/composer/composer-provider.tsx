@@ -136,11 +136,13 @@ function ComposeFromUrl({ onOpen }: { onOpen: (p?: ComposerPrefill) => void }) {
     const quantity = Number(params.get("quantity"));
     onOpen({
       serviceId: params.get("service") ?? undefined,
+      customerId: params.get("customer") ?? undefined,
+      customerName: params.get("customerName") ?? undefined,
       link: params.get("link") ?? undefined,
       quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : undefined,
     });
     const rest = new URLSearchParams(params);
-    for (const k of ["compose", "service", "link", "quantity"]) rest.delete(k);
+    for (const k of ["compose", "service", "link", "quantity", "customer", "customerName"]) rest.delete(k);
     router.replace(rest.size ? `${pathname}?${rest}` : pathname, { scroll: false });
   }, [params, onOpen, router, pathname]);
 

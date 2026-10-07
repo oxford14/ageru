@@ -46,7 +46,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   });
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="max-w-3xl space-y-6">
       <Link
         href="/orders"
         className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground"

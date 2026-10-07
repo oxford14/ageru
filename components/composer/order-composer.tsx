@@ -65,10 +65,17 @@ import {
 } from "@/lib/panel/shared";
 import { PlatformGlyph } from "@/components/composer/platform-glyph";
 import { LinkHistory, StartPanels, linkKey } from "@/components/composer/history-panels";
+import { CustomerPicker } from "@/components/customers/customer-picker";
 import { SendSequence, type SendPhase } from "@/components/composer/send-sequence";
 import { cn } from "@/lib/utils";
 
-export type ComposerPrefill = { serviceId?: string; link?: string; quantity?: number };
+export type ComposerPrefill = {
+  serviceId?: string;
+  link?: string;
+  quantity?: number;
+  customerId?: string;
+  customerName?: string;
+};
 
 const GOAL_ICON: Record<GoalKey, typeof Heart> = {
   followers: UserPlus,
@@ -125,6 +132,8 @@ export function OrderComposer({
 
   // ---- state ---------------------------------------------------------------
   const pre = prefill?.serviceId ? byId.get(prefill.serviceId) : undefined;
+  const [customerId, setCustomerId] = useState<string | null>(prefill?.customerId ?? null);
+  const [customerName, setCustomerName] = useState<string | null>(prefill?.customerName ?? null);
   const [linkInput, setLinkInput] = useState(prefill?.link ?? "");
   const [platformChoice, setPlatformChoice] = useState<string | null>(pre?.platform ?? null);
   const [choosingPlatform, setChoosingPlatform] = useState(false);
@@ -257,7 +266,8 @@ export function OrderComposer({
   }, [insight, history]);
 
   let blocker: string | null = null;
-  if (!insight) blocker = "Paste a link to start";
+  if (!customerId) blocker = "Pick a customer";
+  else if (!insight) blocker = "Paste a link to start";
   else if (!platform) blocker = "Choose the platform";
   else if (!goal) blocker = "Choose what to boost";
   else if (!service || !fields) blocker = "Pick a service";
@@ -387,6 +397,7 @@ export function OrderComposer({
     const toStage1 = setTimeout(() => setStage(1), 550);
     const [res] = await Promise.all([
       placeOrderAction({
+        customerId: customerId!,
         serviceId: service.id,
         link: insight.link,
         quantity: fields.quantity ? qty : undefined,
@@ -479,6 +490,16 @@ export function OrderComposer({
         </header>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-5 sm:py-6">
+          <CustomerPicker
+            className="mb-6"
+            value={customerId}
+            selectedName={customerName}
+            onChange={(id, name) => {
+              setCustomerId(id);
+              setCustomerName(name);
+            }}
+            disabled={phase !== "compose"}
+          />
           <ol className="relative space-y-8 before:absolute before:top-3 before:bottom-3 before:left-[11px] before:w-px before:bg-border">
             {/* 1 — Where */}
             <Step n={1} title="Where should it go?" done={!!insight && !!platform}>

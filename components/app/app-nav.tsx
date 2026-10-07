@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Layers, ListOrdered, Plus, Search, Settings, Users } from "lucide-react";
+import { ContactRound, Home, Layers, ListOrdered, Plus, Search, Settings, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useComposer } from "@/components/composer/composer-provider";
 
 const items = [
   { href: "/dashboard", label: "Overview", icon: Home },
   { href: "/orders", label: "Orders", icon: ListOrdered },
+  { href: "/customers", label: "Customers", icon: ContactRound },
   { href: "/services", label: "Services", icon: Search },
   { href: "/combos", label: "Combos", icon: Layers },
   { href: "/settings", label: "Settings", icon: Settings },
@@ -22,6 +23,9 @@ function isActive(pathname: string, href: string) {
   }
   if (href === "/combos") {
     return pathname === "/combos" || pathname.startsWith("/combos/");
+  }
+  if (href === "/customers") {
+    return pathname === "/customers" || pathname.startsWith("/customers/");
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
@@ -93,7 +97,7 @@ export function NewOrderLink({ className }: { className?: string }) {
 export function MobileTabBar({ activeCount }: { activeCount: number }) {
   const pathname = usePathname();
   const { open } = useComposer();
-  const [overview, orders, services, combos, settings] = items;
+  const [overview, orders, customers, services, combos, settings] = items;
   const tab = (item: (typeof items)[number]) => {
     const active = isActive(pathname, item.href);
     const Icon = item.icon;
@@ -118,17 +122,18 @@ export function MobileTabBar({ activeCount }: { activeCount: number }) {
   return (
     <nav
       aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-40 grid h-16 grid-cols-6 border-t bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 grid h-16 grid-cols-7 border-t bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
     >
       {tab(overview)}
       {tab(orders)}
+      {tab(customers)}
       <button
         type="button"
         onClick={() => open()}
         aria-label="New order"
-        className="flex items-center justify-center"
+        className="col-span-1 flex items-center justify-center"
       >
-        <span className="flex size-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
+        <span className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
           <Plus className="size-5" />
         </span>
       </button>

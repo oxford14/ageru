@@ -99,7 +99,7 @@ export async function AppShell({
             ) : null}
           </header>
 
-          <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-6 pb-24 md:px-8 md:pt-10 md:pb-12">
+          <main className="w-full max-w-7xl flex-1 px-4 pt-6 pb-24 md:px-8 md:pt-10 md:pb-12 xl:px-10">
             {children}
           </main>
         </div>

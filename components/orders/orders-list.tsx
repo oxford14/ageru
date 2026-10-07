@@ -21,13 +21,15 @@ export type OrderListItem = Pick<
   | "error_message"
   | "combo_group_id"
   | "combo_plan_id"
+  | "customer_id"
 > & {
   services?: { name: string } | null;
   combo_plan?: { name: string } | null;
+  customer?: { name: string } | null;
 };
 
 export const ORDER_LIST_COLUMNS =
-  "id, order_number, provider_order_id, service_name, target_url, quantity, remains, status, customer_charge, currency, created_at, error_message, combo_group_id, combo_plan_id, services(name), combo_plan:combo_plans(name)";
+  "id, order_number, provider_order_id, service_name, target_url, quantity, remains, status, customer_charge, currency, created_at, error_message, combo_group_id, combo_plan_id, customer_id, services(name), combo_plan:combo_plans(name), customer:customers(name)";
 
 const grid = "md:grid md:grid-cols-[minmax(0,1fr)_150px_96px_110px_84px] md:items-center md:gap-6";
 
@@ -72,6 +74,12 @@ export function OrdersList({
                     {name}
                   </p>
                   <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                    {o.customer?.name ? (
+                      <>
+                        <span className="font-medium text-foreground/80">{o.customer.name}</span>
+                        <span className="mx-1.5 text-border">·</span>
+                      </>
+                    ) : null}
                     <span className="font-mono">#{o.provider_order_id ?? o.order_number}</span>
                     <span className="mx-1.5 text-border">/</span>
                     {shortLink(o.target_url)}

@@ -14,6 +14,7 @@ import {
   platformLabel,
   type PanelService,
 } from "@/lib/panel/shared";
+import { CustomerPicker } from "@/components/customers/customer-picker";
 import { ServicePicker } from "@/components/orders/service-picker";
 import { cn } from "@/lib/utils";
 
@@ -40,6 +41,8 @@ export function OrderForm({
   const router = useRouter();
   const initial = services.find((s) => s.id === initialServiceId) ?? null;
   const [service, setService] = useState<PanelService | null>(initial);
+  const [customerId, setCustomerId] = useState<string | null>(null);
+  const [customerName, setCustomerName] = useState<string | null>(null);
   const [link, setLink] = useState(initialLink ?? "");
   const [quantity, setQuantity] = useState(initial ? String(Math.max(initial.min, Math.min(1000, initial.max))) : "");
   const [comments, setComments] = useState("");
@@ -64,6 +67,7 @@ export function OrderForm({
   const short = after != null && after < 0;
 
   const problems: string[] = [];
+  if (!customerId) problems.push("Pick a customer");
   if (service && fields) {
     if (!link.trim()) problems.push("Add the link");
     if (fields.quantity && (!Number.isInteger(qty) || qty < service.min || qty > service.max)) {
@@ -98,6 +102,7 @@ export function OrderForm({
     setError(null);
     startTransition(async () => {
       const res = await placeOrderAction({
+        customerId: customerId!,
         serviceId: service.id,
         link: link.trim(),
         quantity: fields?.quantity ? qty : undefined,
@@ -161,6 +166,15 @@ export function OrderForm({
             </div>
           ) : (
             <div className="space-y-5 p-4">
+              <CustomerPicker
+                value={customerId}
+                selectedName={customerName}
+                onChange={(id, name) => {
+                  setCustomerId(id);
+                  setCustomerName(name);
+                }}
+                disabled={pending}
+              />
               <div className="rounded-md bg-muted/60 p-3">
                 <p className="text-[13px] leading-snug font-medium">{service.name}</p>
                 <p className="mt-1 text-xs text-muted-foreground">

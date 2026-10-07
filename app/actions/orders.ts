@@ -42,6 +42,8 @@ export async function placeOrderAction(
     const order = await placeOrder({ userId: user.id, ...parsed.data });
     revalidatePath("/dashboard");
     revalidatePath("/orders");
+    revalidatePath("/customers");
+    if (parsed.data.customerId) revalidatePath(`/customers/${parsed.data.customerId}`);
     return {
       ok: true,
       data: { id: order.id, orderNumber: order.order_number, providerOrderId: order.provider_order_id },
@@ -75,6 +77,8 @@ export async function placeComboOrderAction(
     revalidatePath("/dashboard");
     revalidatePath("/orders");
     revalidatePath("/combos");
+    revalidatePath("/customers");
+    if (parsed.data.customerId) revalidatePath(`/customers/${parsed.data.customerId}`);
     const failures = result.results
       .filter((r): r is { slotId: string; ok: false; error: string } => !r.ok)
       .map((f) => ({ slotId: f.slotId, error: f.error }));

@@ -77,8 +77,9 @@ export async function getComposerContextAction(): Promise<ComposerContext> {
       .select("service_id")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      // Before the migration runs the table is missing; treat that as "none yet".
-      .then(({ data: rows }) => (rows ?? []).map((r) => r.service_id)),
+      .then(({ data: rows, error }) =>
+        error ? [] : (rows ?? []).map((r) => r.service_id)
+      ),
   ]);
 
   return {

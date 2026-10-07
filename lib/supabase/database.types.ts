@@ -111,6 +111,14 @@ export type ComboPlanRow = {
   updated_at: string;
 };
 
+export type CustomerRow = {
+  id: string;
+  name: string;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type ComboPlanItemRow = {
   id: string;
   plan_id: string;
@@ -157,6 +165,7 @@ export type OrderRow = {
   idempotency_key: string;
   combo_group_id: string | null;
   combo_plan_id: string | null;
+  customer_id: string | null;
   created_at: string;
   updated_at: string;
   completed_at: string | null;
@@ -350,6 +359,11 @@ export interface Database {
           },
         ]
       >;
+      customers: TableDef<
+        CustomerRow,
+        Partial<CustomerRow>,
+        Partial<CustomerRow>
+      >;
       orders: TableDef<
         OrderRow,
         Partial<OrderRow>,
@@ -367,6 +381,13 @@ export interface Database {
             columns: ["service_id"];
             isOneToOne: false;
             referencedRelation: "services";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "orders_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "customers";
             referencedColumns: ["id"];
           },
         ]

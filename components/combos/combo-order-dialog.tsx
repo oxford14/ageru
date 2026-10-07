@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { CustomerPicker } from "@/components/customers/customer-picker";
 import { cn } from "@/lib/utils";
 
 const fieldClass =
@@ -82,6 +83,8 @@ export function ComboOrderDialog({
 }) {
   const router = useRouter();
   const [slots, setSlots] = useState<SlotState[]>([]);
+  const [customerId, setCustomerId] = useState<string | null>(null);
+  const [customerName, setCustomerName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const comboGroupId = useRef<string | null>(null);
@@ -110,6 +113,8 @@ export function ComboOrderDialog({
           idempotencyKey: crypto.randomUUID(),
         }))
     );
+    setCustomerId(null);
+    setCustomerName(null);
     setError(null);
   }, [plan, open]);
 
@@ -156,6 +161,7 @@ export function ComboOrderDialog({
 
   function validate(): string | null {
     if (!plan) return "No plan selected.";
+    if (!customerId) return "Pick a customer.";
     for (let i = 0; i < slots.length; i++) {
       const slot = slots[i];
       const service = serviceById.get(slot.serviceId);
@@ -196,6 +202,7 @@ export function ComboOrderDialog({
     setError(null);
     startTransition(async () => {
       const res = await placeComboOrderAction({
+        customerId: customerId!,
         comboPlanId: plan.id,
         comboGroupId: comboGroupId.current!,
         lines: slots.map((slot) => {
@@ -245,6 +252,15 @@ export function ComboOrderDialog({
         </DialogHeader>
 
         <div className="space-y-6 py-2">
+          <CustomerPicker
+            value={customerId}
+            selectedName={customerName}
+            onChange={(id, name) => {
+              setCustomerId(id);
+              setCustomerName(name);
+            }}
+            disabled={pending}
+          />
           {slots.map((slot, index) => {
             const service = slot.serviceId ? serviceById.get(slot.serviceId) : null;
             const fields = service ? fieldsForType(service.type) : null;

@@ -22,6 +22,7 @@ export class OrderServiceError extends Error {
 
 export type PlaceOrderInput = {
   userId: string;
+  customerId: string;
   serviceId: string;
   link: string;
   quantity?: number;
@@ -83,6 +84,16 @@ export async function placeOrder(input: PlaceOrderInput): Promise<OrderRow> {
     .maybeSingle();
   if (existing) return existing;
 
+  const { data: customer, error: customerError } = await supabase
+    .from("customers")
+    .select("id")
+    .eq("id", input.customerId)
+    .maybeSingle();
+  if (customerError) throw customerError;
+  if (!customer) {
+    throw new OrderServiceError("Pick a valid customer.", "INVALID_CUSTOMER", 400);
+  }
+
   const service = await findService(input.serviceId);
   if (!service) {
     throw new OrderServiceError(
@@ -133,6 +144,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<OrderRow> {
       idempotency_key: input.idempotencyKey,
       combo_group_id: input.comboGroupId ?? null,
       combo_plan_id: input.comboPlanId ?? null,
+      customer_id: input.customerId,
     })
     .select("*")
     .single();

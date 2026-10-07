@@ -44,6 +44,7 @@ export async function placeComboOrder(
     try {
       const order = await placeOrder({
         userId,
+        customerId: payload.customerId,
         serviceId: line.serviceId,
         link: line.link,
         quantity: line.quantity,
