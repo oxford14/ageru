@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isOwnerEmail } from "@/lib/auth/owner";
 import type { Tables } from "@/lib/supabase/database.types";
 import type { User } from "@supabase/supabase-js";
 
@@ -28,7 +29,7 @@ export async function ensureProfileForUser(
       id: user.id,
       email,
       username,
-      role: "customer",
+      role: isOwnerEmail(email) ? "super_admin" : "reseller",
       created_at: now,
       updated_at: now,
     })

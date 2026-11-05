@@ -1,4 +1,5 @@
 import { ensureProfileForUser } from "@/lib/auth/ensure-profile";
+import { syncProfileRole } from "@/lib/auth/sync-profile-role";
 import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/lib/supabase/database.types";
 
@@ -28,19 +29,21 @@ export async function requireUser(): Promise<SessionUser> {
   if (profileError || !profile) {
     try {
       const provisioned = await ensureProfileForUser(user);
+      const synced = await syncProfileRole(user, provisioned);
       return {
         id: user.id,
-        email: user.email ?? provisioned.email,
-        profile: provisioned,
+        email: user.email ?? synced.email,
+        profile: synced,
       };
     } catch {
       throw new Error("UNAUTHORIZED");
     }
   }
 
+  const synced = await syncProfileRole(user, profile);
   return {
     id: user.id,
-    email: user.email ?? profile.email,
-    profile,
+    email: user.email ?? synced.email,
+    profile: synced,
   };
 }

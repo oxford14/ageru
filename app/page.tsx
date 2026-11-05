@@ -1,10 +1,12 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { homePathForRole } from "@/lib/auth/roles";
+import { requireUser } from "@/lib/auth/require-user";
 
 export default async function HomePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  redirect(user ? "/dashboard" : "/login");
+  try {
+    const user = await requireUser();
+    redirect(homePathForRole(user.profile.role, user.email));
+  } catch {
+    redirect("/login");
+  }
 }

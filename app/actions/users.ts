@@ -80,7 +80,11 @@ export async function listUsersAction(): Promise<Result<ManagedUser[]>> {
         id: u.id,
         email,
         username: profile?.username ?? null,
-        access: isOwnerEmail(email) ? "owner" : profile?.role === "admin" ? "admin" : "none",
+        access: isOwnerEmail(email)
+          ? "owner"
+          : profile?.role === "super_admin" || profile?.role === "admin"
+            ? "admin"
+            : "none",
         createdAt: u.created_at,
         lastSignInAt: u.last_sign_in_at ?? null,
         orderCount: ordersByUser.get(u.id) ?? 0,
@@ -116,7 +120,7 @@ export async function createUserAction(input: z.input<typeof createSchema>): Pro
         id: created.user.id,
         email: data.email,
         username: data.username ?? data.email.split("@")[0],
-        role: data.access === "admin" ? "admin" : "customer",
+        role: data.access === "admin" ? "super_admin" : "reseller",
         created_at: created.user.created_at,
         updated_at: new Date().toISOString(),
       },
@@ -129,6 +133,8 @@ export async function createUserAction(input: z.input<typeof createSchema>): Pro
       }
       return { ok: false, error: `User created, but saving the profile failed: ${profileError.message}` };
     }
+
+    await admin.from("wallets").upsert({ user_id: created.user.id, currency: "PHP" }, { onConflict: "user_id" });
 
     revalidatePath("/users");
     return { ok: true, data: { id: created.user.id } };
@@ -171,7 +177,7 @@ export async function updateUserAction(input: z.input<typeof updateSchema>): Pro
         email: data.email,
         username: data.username,
         // The owner always has access via OWNER_EMAIL; keep their row as admin.
-        role: wasOwner || data.access === "admin" ? "admin" : "customer",
+        role: wasOwner || data.access === "admin" ? "super_admin" : "reseller",
         updated_at: new Date().toISOString(),
       })
       .eq("id", data.id);

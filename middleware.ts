@@ -1,7 +1,18 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
-const protectedPrefixes = ["/dashboard", "/orders", "/services", "/settings"];
+const protectedPrefixes = [
+  "/dashboard",
+  "/orders",
+  "/services",
+  "/settings",
+  "/combos",
+  "/customers",
+  "/users",
+  "/reseller-requests",
+  "/reseller-pricing",
+  "/reseller",
+];
 
 export async function middleware(request: NextRequest) {
   const { user, supabaseResponse } = await updateSession(request);
@@ -20,7 +31,7 @@ export async function middleware(request: NextRequest) {
 
   if ((path === "/login" || path === "/register") && user) {
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    url.pathname = "/";
     return NextResponse.redirect(url);
   }
 
@@ -29,6 +40,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$|api/cron|api/payments/webhook).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$|api/cron|api/payments).*)",
   ],
 };

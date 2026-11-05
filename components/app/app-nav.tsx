@@ -2,7 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ContactRound, Home, Layers, ListOrdered, Plus, Search, Settings, Users } from "lucide-react";
+import {
+  ContactRound,
+  Home,
+  Layers,
+  ListOrdered,
+  Plus,
+  Search,
+  Settings,
+  Store,
+  Tags,
+  Users,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useComposer } from "@/components/composer/composer-provider";
 
@@ -12,6 +23,8 @@ const items = [
   { href: "/customers", label: "Customers", icon: ContactRound },
   { href: "/services", label: "Services", icon: Search },
   { href: "/combos", label: "Combos", icon: Layers },
+  { href: "/reseller-requests", label: "Reseller requests", icon: Store },
+  { href: "/reseller-pricing", label: "Reseller pricing", icon: Tags },
   { href: "/settings", label: "Settings", icon: Settings },
   // Owner only; hidden for other users.
   { href: "/users", label: "Users", icon: Users },

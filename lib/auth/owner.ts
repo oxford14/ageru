@@ -1,10 +1,9 @@
-import { requireUser, type SessionUser } from "@/lib/auth/require-user";
+import { requireSuperAdmin, isSuperAdmin } from "@/lib/auth/roles";
+import { requireUser } from "@/lib/auth/require-user";
 
 /**
- * Orders spend the real SMM panel balance, so access is limited:
- * - the account owner(s): OWNER_EMAIL (comma-separated), falling back to
- *   BOOTSTRAP_ADMIN_EMAIL for existing setups. Only owners manage users.
- * - users the owner gave access to: profiles with role "admin".
+ * Orders spend the real SMM panel balance, so access is limited to super admins
+ * (owner email + delegated staff). Resellers use the separate reseller app.
  */
 export function ownerEmails() {
   const raw = process.env.OWNER_EMAIL || process.env.BOOTSTRAP_ADMIN_EMAIL || "";
@@ -19,15 +18,13 @@ export function isOwnerEmail(email: string | null | undefined) {
   return ownerEmails().includes(email.trim().toLowerCase());
 }
 
-export function canUsePanel(user: Pick<SessionUser, "email" | "profile">) {
-  return isOwnerEmail(user.email) || user.profile.role === "admin";
+export function canUsePanel(user: Parameters<typeof isSuperAdmin>[0]) {
+  return isSuperAdmin(user);
 }
 
-/** Anyone allowed to use the panel (owner or a user with access). */
+/** Super Admin panel access (legacy name kept for imports). */
 export async function requireOwner() {
-  const user = await requireUser();
-  if (!canUsePanel(user)) throw new Error("FORBIDDEN");
-  return user;
+  return requireSuperAdmin();
 }
 
 /** Only the account owner, e.g. for managing users. */

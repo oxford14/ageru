@@ -6,7 +6,14 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
-export type UserRole = "customer" | "admin";
+export type UserRole = "customer" | "admin" | "super_admin" | "reseller";
+export type ResellerRequestStatus =
+  | "pending"
+  | "processing"
+  | "completed"
+  | "failed"
+  | "canceled"
+  | "refunded";
 export type OrderStatus =
   | "pending"
   | "processing"
@@ -115,6 +122,59 @@ export type CustomerRow = {
   id: string;
   name: string;
   notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ResellerServiceRow = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  unit_label: string;
+  min_quantity: number;
+  max_quantity: number;
+  target_input_type: TargetInputType;
+  active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ResellerServicePriceRow = {
+  id: string;
+  service_id: string;
+  price_per_unit: string;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ProviderServiceOfferRow = {
+  id: string;
+  provider_id: string;
+  service_id: string | null;
+  service_slug: string | null;
+  cost_per_unit: string;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ResellerRequestRow = {
+  id: string;
+  reseller_id: string;
+  service_id: string;
+  quantity: number;
+  target_url: string;
+  amount_php: string;
+  status: ResellerRequestStatus;
+  provider_id: string | null;
+  provider_offer_id: string | null;
+  internal_order_id: string | null;
+  idempotency_key: string;
+  failure_reason: string | null;
+  transaction_id: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -440,6 +500,26 @@ export interface Database {
       support_ticket_messages: TableDef<SupportTicketMessageRow>;
       app_settings: TableDef<AppSettingRow>;
       favorite_services: TableDef<FavoriteServiceRow>;
+      reseller_services: TableDef<
+        ResellerServiceRow,
+        Partial<ResellerServiceRow>,
+        Partial<ResellerServiceRow>
+      >;
+      reseller_service_prices: TableDef<
+        ResellerServicePriceRow,
+        Partial<ResellerServicePriceRow>,
+        Partial<ResellerServicePriceRow>
+      >;
+      provider_service_offers: TableDef<
+        ProviderServiceOfferRow,
+        Partial<ProviderServiceOfferRow>,
+        Partial<ProviderServiceOfferRow>
+      >;
+      reseller_requests: TableDef<
+        ResellerRequestRow,
+        Partial<ResellerRequestRow>,
+        Partial<ResellerRequestRow>
+      >;
     };
     Views: Record<string, never>;
     Functions: {
@@ -480,6 +560,26 @@ export interface Database {
         Returns: { new_balance: number; transaction_id: string };
       };
       is_admin: { Args: Record<string, never>; Returns: boolean };
+      is_super_admin: { Args: Record<string, never>; Returns: boolean };
+      is_reseller: { Args: Record<string, never>; Returns: boolean };
+      wallet_reserve_for_reseller_request: {
+        Args: {
+          p_user_id: string;
+          p_amount: number;
+          p_request_id: string;
+          p_idempotency_key: string;
+        };
+        Returns: { new_balance: number; transaction_id: string };
+      };
+      wallet_refund_reseller_request: {
+        Args: {
+          p_user_id: string;
+          p_amount: number;
+          p_request_id: string;
+          p_idempotency_key: string;
+        };
+        Returns: { new_balance: number; transaction_id: string };
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

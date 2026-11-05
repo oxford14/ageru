@@ -1,8 +1,22 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { homePathForRole } from "@/lib/auth/roles";
+import { ensureProfileForUser } from "@/lib/auth/ensure-profile";
+import { syncProfileRole } from "@/lib/auth/sync-profile-role";
 import { createClient } from "@/lib/supabase/server";
-import { isOwnerEmail } from "@/lib/auth/owner";
+
+async function redirectAfterAuth() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  let profile = await ensureProfileForUser(user);
+  profile = await syncProfileRole(user, profile);
+  redirect(homePathForRole(profile.role, user.email));
+}
 
 export async function signIn(formData: FormData) {
   const email = String(formData.get("email") ?? "");
@@ -12,18 +26,13 @@ export async function signIn(formData: FormData) {
   if (error) {
     redirect(`/login?error=${encodeURIComponent(error.message)}`);
   }
-  redirect("/dashboard");
+  await redirectAfterAuth();
 }
 
 export async function signUp(formData: FormData) {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
   const username = String(formData.get("username") ?? "");
-  if (!isOwnerEmail(email)) {
-    redirect(
-      `/register?error=${encodeURIComponent("This is a private panel. Only the owner's email can register.")}`
-    );
-  }
   const supabase = await createClient();
   const { error } = await supabase.auth.signUp({
     email,
@@ -35,7 +44,7 @@ export async function signUp(formData: FormData) {
   if (error) {
     redirect(`/register?error=${encodeURIComponent(error.message)}`);
   }
-  redirect("/dashboard");
+  await redirectAfterAuth();
 }
 
 export async function signOut() {
